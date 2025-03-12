@@ -1,7 +1,11 @@
-#include <stdio.h> // System library < >, User library ""
+#include<stdio.h>
 
-void main() {
-    printf("Hello World~!!\n")
+void hi(){
+    printf("Linux World~!!\n");
+}
 
-// return 0;
-;}
+#include<stdio.h>
+
+void main(){
+    printf("Hello World~!!\n");
+}
