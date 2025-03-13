@@ -9,3 +9,6 @@ c/makefile/test
 !c/**/*.a
 !c/**/Makefile*
 
+# Java
+**/*.class
+
