@@ -15,3 +15,7 @@ c/makefile/test
 # Scala
 scala/**/project
 scala/**/target
+
+# nodejs
+node/**/node_modules
+node/**/package-lock.json
