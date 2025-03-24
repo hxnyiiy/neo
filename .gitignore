@@ -12,3 +12,6 @@ c/makefile/test
 # Java
 **/*.class
 
+# Scala
+scala/**/project
+scala/**/target
