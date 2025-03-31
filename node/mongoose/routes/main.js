@@ -32,67 +32,185 @@ app.get('/list', function (req, res) {
 });
 
 // get
-app.get('/get', function (req, res) {
-    var userid = req.query.input
-    User.findOne({ userid: userid }, function (err, docs) {
-        if (err) console.log(err);
-        res.send(docs);
-    }).projection({_id:0});
+app.get('/get', async function (req, res) {
+    try {
+        var userid = req.query.userid;
+        if (!userid) {
+            return res.status(400).send("User ID is required");
+        }
+
+        var user = await User.findOne({'userid': userid}).select("-_id");   
+        if (!user) {
+        return res.status(404).send("User Not Found");
+        }
+
+        res.status(200).json(user);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Error retrieving user"); 
+    }
 });
 
+
 // insert
-app.post('/insert', function (req, res) {
-    var { userid, name, city, sex, age } = req.body;
-    var user = new User({ 'userid': userid, 'name': name, 'city': city, 'sex': sex, 'age': age });
-    user.save(function (err, slience) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Insert Error');
-            return; 
-        } else {
-            res.status(200).send('Insert Success');
-        }
-    })
-})
+app.post('/insert', async function (req, res) {
+   try {
+       var { userid, name, city, sex, age } = req.query;
+
+       if (!userid || !name || !city || !sex || !age) {
+           return res.status(400).send("All fileds are required");
+       }
+
+       var existingUser = await User.findOne({'userid': userid});
+       if (existingUser) {
+           return res.status(409).send("User ID already exists");
+       }
+
+       var user = new User({
+           userid: userid,
+           name: name,
+           city: city,
+           sex: sex,
+           age: age
+       });   
+
+       await user.save();
+       res.status(200).send("Insert Success");
+   } catch (err) {
+    console.log(err);
+    res.status(500).send("Insert Error");
+   }
+}); 
+
+
+
+
+
 
 // update
-app.post('/update', function (req, res) {
-    var { userid, name, city, sex, age } = req.body;
-    User.findOne({'userid': userid}, function (err, user) {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Update Error');
-            return; 
-        } else {
-            user.name = name;
-            user.city = city;
-            user.sex = sex;
-            user.age = age;
+app.post('/update', async function (req, res) {
+    try {
+        var { userid, name, city, sex, age } = req.body;
 
-            user.save(function (err, slience) {
-                if (err) {
-                    console.log(err);
-                    res.status(500).send('Update Error');
-                    return; 
-                } else {
-                    res.status(200).send('Update Success');
-                }
-            })
+        if (!userid) {
+            return res.status(400).send("User ID is required");
         }
-    })
-})
 
-// delete
-app.post('/delete', function (req, res) {
-    var userid = req.body.userid;
-    var user = User.findOne({'userid': userid})
+        var user = await User.findOne({'userid': userid});
+        if (!user) {
+            return res.status(404).send("User Not Found");
+        }
 
-    user.deleteMany({'userid': userid}).then(function() {
-        res.status(200).send('Delete Success');
-    }).catch (function (error) {
-        console.log(error)
-        res.status(500).send('Delete Error');
-    })
-})
+        user.name = name || user.name;
+        user.city = city || user.city;
+        user.sex = sex || user.sex;
+        user.age = age || user.age;
+
+        await user.save();
+        res.status(200).send("Update Success");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Update Error");
+    }
+});
+
+
+app.post('/delete', async function (req, res) {
+    try {
+        var userid = req.body.userid;
+        if (!userid) {
+            return res.status(400).send("User ID is required");
+        }
+
+        var user = await User.findOne({'userid': userid});
+        if (!user) {
+            return res.status(404).send("User Not Found");
+        }
+
+        await user.deleteMany({'userid': userid});
+        res.status(200).send("Delete Success");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Delete Error");
+    }
+});
 
 module.exports = app;
+
+async.series([query1, query2, query3, query4, query5,  query6], 
+    function (err, result) {
+    if (err) {
+        console.log('Error : ' + err);
+    } else {
+      console.log("Task Finished");
+    }
+});
+
+function query1(callback) {
+    // select * from users
+    User.find({}, {_id: 0}).exec(function (err, user) {
+        console.log("\nQuery 1");
+        console.log(user + "\n");
+        callback(null);
+    });
+}
+
+function query2(callback) {
+    // select * from users
+    User.find({}, {_id: 0, userid: 1, name: 1, city: 1}).exec(function (
+        err,
+        user
+    ) {
+        console.log("\nQuery 2");
+        console.log(user + "\n");
+        callback(null);
+    });
+}
+
+function query3(callback) {
+    User.find({ city: "Seoul" }, {_id: 0 })
+    .sort({ userid: 1 })
+    .limit(3)
+    .exec(function (err, user) {
+        console.log("\nQuery 3");
+        console.log(user + "\n");
+        callback(null);
+    });
+}
+
+function query4(callback) {
+    User.find({ userid: { $regex: "02"} }, {_id: 0 })
+    .select("userid name")
+    .exec(function (err, user) {
+        console.log("\nQuery 4");
+        console.log(user + "\n");
+        callback(null); 
+    });
+}
+
+function query5(callback) {
+    User.find({city: "Seoul", age: { $gt: 15, $lt:23} }, {_id: 0 })
+    .sort({age: -1})
+    .select("userid name age")
+    .exec(function (err, user) {
+        console.log("\nQuery 5");
+        console.log(user + "\n");
+        callback(null); 
+    });
+}
+
+function query6(callback) {
+    User.find({}, {_id: 0 })
+    .where("city")
+    .equals("Seoul")
+    .where("age")
+    .gt(15)
+    .lt(30)
+    .sort({ age: 1 })
+    .select("userid name age")
+    .exec(function (err, user) {
+        console.log("\nQuery 6");
+        console.log(user + "\n");
+        callback(null);
+    });   
+}
