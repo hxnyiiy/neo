@@ -24,12 +24,12 @@ app.get('/api/users', (req, res) => {
 
 app.get('/api/users/user', (req, res) => {
     let user = "";
-    const { user_id, name } = req.query;
+    const { id, name } = req.query;
 
     if (req.query.name == null) {
-        user = users.filter(data => data.id == user_id);
+        user = users.filter(data => data.id == id);
     } else {
-        user = users.filter(data => data.id == user_id && data.name == name);
+        user = users.filter(data => data.id == id && data.name == name);
     }
     res.json({ok: false, users: user})
 })
@@ -38,7 +38,7 @@ app.get('/api/users/user', (req, res) => {
 app.get('/api/users/:id', (req, res) => {
     let id = req.params.id
 
-    const user = users.filter(data => data.id == user_id);
+    const user = users.filter(data => data.id == id);
     res.json({ok: false, users: user})
 })
     
