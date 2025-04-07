@@ -19,8 +19,8 @@
             function send() {
                 let parameters = {
                     input: document.getElementById("input").value,
-                }
-                work.postMessage(parameters);
+                };
+                worker.postMessage(parameters);
             }
 
             worker.onmessage = function (e) {
