@@ -2,7 +2,7 @@
 
 import calc_func
 
-from python.dataProject import calc_func
+from python.pythonBasic import calc_func
 
 a = int(input("Enter a number: "))
 b = int(input("Enter another number: "))
