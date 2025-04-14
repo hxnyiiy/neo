@@ -105,4 +105,4 @@ ax1.axis('equal')
 filename = 'p280_DataframeGraph03.png'
 plt.savefig(filename, dpi=400, bbox_inches='tight')
 print(filename + ' saved')
-#plt.show() 
+plt.show() 
