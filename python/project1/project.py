@@ -1,20 +1,41 @@
 import pandas as pd
+import folium
 
-# 엑셀 파일 경로 지정 (현재 파이썬 파일 기준으로 경로)
-file_path = '지반침하사고발생신고 (1).xls'
+# 1. 데이터 불러오기
+file_path = 'sinkholes.csv'
+df = pd.read_csv(file_path, encoding='utf-8', header=1)  # ⭐️ header=1 추가!
 
-# 엑셀 파일 읽기
-df = pd.read_excel(file_path)
+# 데이터 확인
+print(df.head())
 
-# 데이터프레임을 JSON으로 변환
-json_data = df.to_json(orient='records', force_ascii=False, indent=2)
+# 2. 위도, 경도 컬럼명 정확히 입력
+lat_col = '사고지점위도'
+lon_col = '사고지점경도'
 
-# 결과 출력
-print(json_data)
+# 3. 지도 생성 (서울 중심)
+map_center = [37.5665, 126.9780]
+sinkhole_map = folium.Map(location=map_center, zoom_start=7)
 
-# JSON 파일로 저장하고 싶으면 이렇게
-with open('output.json', 'w', encoding='utf-8') as f:
-    f.write(json_data)
+# 4. 마커 찍기
+for idx, row in df.iterrows():
+    lat = row[lat_col]
+    lon = row[lon_col]
 
-print('JSON 파일 저장 완료 ✅')
+    if pd.isna(lat) or pd.isna(lon):
+        continue
 
+    folium.CircleMarker(
+        location=[lat, lon],
+        radius=3,
+        color='red',
+        fill=True,
+        fill_color='red',
+        fill_opacity=0.7
+    ).add_to(sinkhole_map)
+
+# 5. 지도 저장
+sinkhole_map.save('sinkhole_map.html')
+print('sinkhole_map.html 저장 완료!')
+
+# 6. 결과 보기
+sinkhole_map
