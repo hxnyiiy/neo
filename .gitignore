@@ -28,6 +28,7 @@ python/**/.idea
 python/**/.venv
 python /**/__pycache__/
 secret.json
+**/ secret.json
 
 ## python
 mongodb/backup
