@@ -63,18 +63,21 @@ async def register_req_user(req: RequestUserDto):
     return req.dict()
 
 @app.post(
-    path='/registerRes',
+    path='/register',
     description='회원가입 API입니다.',
     status_code=201,
     response_model = ResponseUserDto,
     responses={
-        200: {
+        201: {
             "description": "가입 사용자 정보"
         }
     }
 )
-async def register_res_user(req: ResponseUserDto):
-    return req.dict()
+async def register_user(req: ResponseUserDto):
+    user = User(**req.dict())
+    session=add(user)
+    session=commit()
+    return RequestUserDto(**req.dict())
 
 if __name__ == '__main__':
     uvicorn.run(app, host='0.0.0.0', port=3000)
