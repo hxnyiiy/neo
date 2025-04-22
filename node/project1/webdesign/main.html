@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Sinkhole & House Info</title>
+  <link rel="stylesheet" href="main.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- 좌측 검색 영역 -->
+    <aside class="sidebar">
+      <h2>Sinkholes? Houses?</h2>
+      <input type="text" placeholder="Search..." class="search-input">
+      <div class="icon-row">
+        <div class="icon-circle"></div>
+        <div class="icon-circle"></div>
+        <div class="icon-circle"></div>
+      </div>
+      <div class="card-row">
+        <div class="info-card">카테고리1</div>
+        <div class="info-card">카테고리2</div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+    <div class="map-section"></div> 
+      </div>
+
+      <!-- 대화창 -->
+      <div class="chatbox" id="chatbox">
+        <!-- JS가 메시지를 타이핑하며 여기에 추가됨 -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const messages = [
+      { side: 'left', name: 'You', time: '14:32', text: '여긴 좀 위험해 보여요.' },
+      { side: 'right', name: 'Me', time: '14:33', text: '진짜? 사진 좀 보여줘!' },
+      { side: 'left', name: 'You', time: '14:34', text: '여기 보세요. 예전에 침하 있었어요.' },
+      { side: 'right', name: 'Me', time: '14:35', text: '헐... 조심해야겠다.' },
+    ];
+
+    const chatbox = document.getElementById('chatbox');
+
+    async function typeMessage(message) {
+      return new Promise(resolve => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${message.side}`;
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = `${message.name} · ${message.time}`;
+
+        const text = document.createElement('div');
+        text.className = 'text typing';
+        msgDiv.appendChild(meta);
+        msgDiv.appendChild(text);
+        chatbox.appendChild(msgDiv);
+
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i <= message.text.length) {
+            text.textContent = message.text.slice(0, i);
+            i++;
+          } else {
+            clearInterval(interval);
+            text.classList.remove('typing');
+            resolve();
+          }
+        }, 40);
+      });
+    }
+
+    async function showMessages() {
+      for (let i = 0; i < messages.length; i++) {
+        await typeMessage(messages[i]);
+        chatbox.scrollTop = chatbox.scrollHeight;
+      }
+    }
+
+    showMessages();
+  </script>
+</body>
+</html>
