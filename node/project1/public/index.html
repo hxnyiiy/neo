@@ -1,195 +1,194 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>싱크홀</title>
-    <script src="/main.js"></script>
-</head> -->
-<!-- <body>
-    <h1>내 위치</h1>
-    <button onclick="sendCurrentLocation()">위치전송</button>
-
-    <script>
-        function sendCurrentLocation() {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                console.log("위도:", latitude, "경도:", longitude);
-
-                fetch("/currentloc", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        latitude,
-                        longitude
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    console.log("FastAPI 응답:", data);
-                    alert("서버 응답: " + JSON.stringify(data));
-                });
-            });
-        }
-    </script>
-</body> -->
-<!-- <body>
-<div class="contain">
-    <label></label>
-    <input>
-</div>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>Sinkhole & House Search</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 2rem;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .search-bar {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-    }
-    .search-bar input {
-      width: 60%;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    .categories {
-      display: flex;
-      justify-content: space-around;
-      margin: 2rem 0;
-    }
-    .categories button {
-      border: none;
-      border-radius: 50%;
-      width: 100px;
-      height: 100px;
-      background-color: #e0e0e0;
-      font-size: 0.9rem;
-      padding: 0.5rem;
-      cursor: pointer;
-    }
-    form label {
-      display: block;
-      margin-top: 1rem;
-    }
-    form input {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    button[type="submit"] {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-    }
-    #result {
-      margin-top: 2rem;
-      font-weight: bold;
-      color: #333;
-    }
-    .map {
-      background: #d0d0d0;
-      height: 250px;
-      border-radius: 10px;
-      margin-top: 1.5rem;
-      text-align: center;
-      line-height: 250px;
-      font-size: 1.2rem;
-      color: #555;
-    }
-  </style>
+  <title>Sinkholes & Houses</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="/index.css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Sinkhole & House Info</h1>
+  <div class="intro-overlay">
+    <span class="intro-title">
+      당신 근처의 싱크홀
+    </span>
 
-    <!-- Search Location -->
-    <div class="search-bar">
-      <input type="text" id="search" placeholder="Search Location..." />
+  </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        document.querySelector('.intro-overlay').classList.add('hide');
+      }, 1500);
+    });
+  </script>
+  <div class="top-bar">
+    <header class="main-title">
+  당신 근처의 싱크홀
+  <span class="falling-rock-wrap">
+    <svg class="falling-rock" width="20" height="20" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="8" fill="#b97b0b" />
+    </svg>
+  </span>
+</header>
+    <div class="icon-bar">
+      <span class="icon" onclick="showContent('home', this)">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span class="icon-label">Home</span>
+      </span>
+      <span class="icon" onclick="showContent('form', this)">
+        <span class="material-symbols-outlined">search</span>
+        <span class="icon-label">Search</span>
+      </span>
+      <span class="icon" onclick="showContent('data', this)">
+        <span class="material-symbols-outlined">apartment</span>
+        <span class="icon-label">Data</span>
+      </span>
     </div>
-
-    <!-- Category Section -->
-    <div class="categories">
-      <button>My<br/>Location<br/>+ Sinkholes</button>
-      <button>Target Apt<br/>+ Sinkholes</button>
-      <button>Home<br/>+ Sinkholes</button>
-    </div>
-
-    <!-- Location Form -->
-    <form id="locationForm">
-      <label>시:
-        <input type="text" id="city" required />
-      </label>
-      <label>구/군:
-        <input type="text" id="district" required />
-      </label>
-      <button type="submit">전송</button>
-    </form>
-
-    <!-- 지도 섹션 -->
-    <div class="map">지도 영역</div>
-
-    <!-- 결과 -->
-    <div id="result"></div>
   </div>
 
+  <div class="main-content" id="content">
+    여기에 내용이 표시됩니다.
+  </div>
   <script>
-    const form = document.getElementById('locationForm');
-    const resultDiv = document.getElementById('result');
+    function showMapWithSinkholes(list) {
+      const mapDiv = document.getElementById("map");
+      const map = L.map(mapDiv).setView([37.4979, 127.0276], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+      }).addTo(map);
+      list.forEach(item => {
+        const { latitude, longitude, location, date, cause } = item;
+        L.circleMarker([latitude, longitude], {
+          radius: 7,
+          color: 'red',
+          weight: 1,
+          fillColor: 'red',
+          fillOpacity: 0.6
+        }).addTo(map)
+          .bindPopup(`
+            <div class="custom-popup">
+              <strong>${location}</strong><br/>
+              <b>일자:</b> ${date}<br/>
+              <b>원인:</b> ${cause}
+            </div>
+          `);
+      });
+    }
 
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const city = document.getElementById('city').value;
-      const district = document.getElementById('district').value;
+    function showContent(page, el) {
+      const content = document.getElementById('content');
+      document.querySelectorAll('.icon').forEach(icon => icon.classList.remove('active'));
+      if (el) el.classList.add('active');
 
-      try {
-        const response = await fetch('http://192.168.1.39:8000/aptsinkhole', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ city, district }),
+      if (page === 'form') {
+        content.innerHTML = `
+          <div class="container">
+            <h1 class="search-title">내 근처에도 싱크홀?!</h1>
+            <form id="locationForm" class="search-form-vertical">
+  <label>시:<input type="text" id="city" required /></label>
+  <label>구/군:<input type="text" id="district" required /></label>
+  <button type="submit">전송</button>
+</form>
+            <div id="result"></div>
+          </div>
+        `;
+        bindFormHandler();
+      } else if (page === 'home') {
+        // 통계 데이터 동적 로딩
+        fetch('/sinkhole_stats.json').then(r=>r.json()).then(stats => {
+          document.getElementById('stat-total').textContent = stats.total;
+          document.getElementById('stat-restored').textContent = stats.restored;
+          document.getElementById('stat-thisyear').textContent = stats.this_year;
         });
-
-        const data = await response.json();
-        resultDiv.innerHTML = ""; // 초기화
-
-        data.list.forEach(item => {
-          const div = document.createElement("div");
-          div.innerHTML = `
-            <strong>[${item.sagoDate}]</strong><br/>
-            사고번호: ${item.sagoNo}<br/>
-            내용: ${item.sagoDetail}<br/><br/>
-          `;
-          resultDiv.appendChild(div);
-        });
-      } catch (err) {
-        resultDiv.textContent = '서버 요청 실패: ' + err.message;
+        content.innerHTML = `
+          <div class="stat-cards">
+  <div class="stat-card">
+    <span class="material-symbols-outlined stat-icon">location_on</span>
+    <div class="stat-title">총 싱크홀</div>
+    <div class="stat-value" id="stat-total">-</div>
+  </div>
+  
+  <div class="stat-card">
+    <span class="material-symbols-outlined stat-icon">warning</span>
+    <div class="stat-title">복구 완료</div>
+    <div class="stat-value" id="stat-restored">-</div>
+  </div>
+  
+  <div class="stat-card">
+    <span class="material-symbols-outlined stat-icon">trending_up</span>
+    <div class="stat-title">올해 발생</div>
+    <div class="stat-value" id="stat-thisyear">-</div>
+  </div>
+</div>
+<div class="container map-only">
+  <div class="map-area-left-title">
+    <h1 class="map-title">당신의 위치를 찾아보세요</h1>
+  </div>
+  <div class="map-area-right">
+    <iframe src="/sinkhole_map.html" style="width:100%;height:500px;border:none;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);"></iframe>
+  </div>
+</div>
+<div class="container graph-under">
+  <h1>월별 싱크홀 현황</h1>
+  <img src="/sinkhole_monthly_bar.png" alt="월별 싱크홀 발생 빈도 그래프" style="width:100%;max-width:700px;margin-top:16px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.08);" />
+</div>
+        `;
+      } else if (page === 'data') {
+        content.innerHTML = `
+          <div class="container">
+            <h1>📊 데이터 보기</h1>
+            <p>데이터 시각화 예정</p>
+          </div>
+        `;
       }
-    });
+    }
+
+    function bindFormHandler() {
+      setTimeout(() => {
+        const form = document.getElementById('locationForm');
+        const resultDiv = document.getElementById('result');
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const city = document.getElementById('city').value;
+          const district = document.getElementById('district').value;
+          try {
+            const response = await fetch('/aptsinkhole', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ city, district }),
+            });
+            const data = await response.json();
+            resultDiv.innerHTML = "";
+            data.list.forEach(item => {
+              const div = document.createElement("div");
+              div.innerHTML = `
+                <strong>[${item.sagoDate}]</strong><br/>
+                사고번호: ${item.sagoNo}<br/>
+                내용: ${item.sagoDetail}<br/><br/>
+              `;
+              resultDiv.appendChild(div);
+            });
+          } catch (err) {
+            resultDiv.textContent = '서버 요청 실패: ' + err.message;
+          }
+        });
+      }, 100);
+    }
+
+    window.onload = () => {
+      showContent('home', document.querySelectorAll('.icon')[0]);
+      // 아이콘 클릭 시 라벨 토글
+      document.querySelectorAll('.icon').forEach(icon => {
+        icon.addEventListener('click', function(e) {
+          document.querySelectorAll('.icon').forEach(i => i.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+    };
+
   </script>
 </body>
 </html>
-
-

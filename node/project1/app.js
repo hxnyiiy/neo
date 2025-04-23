@@ -54,7 +54,7 @@ app.post("/aptsinkhole", async (req, res) => {
     try {
       // GET 요청 시, 쿼리 스트링에 넣기
       const response = await axios.get(
-        "http://192.168.1.39:3000/r_aptsinkhole",  // FastAPI 서버 주소
+        "/r_aptsinkhole",  // FastAPI 서버 주소
         {
           params: {
             sido: city,

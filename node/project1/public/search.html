@@ -1,0 +1,178 @@
+ <!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>싱크홀</title>
+    <script src="/main.js"></script>
+</head> -->
+<!-- <body>
+    <h1>내 위치</h1>
+    <button onclick="sendCurrentLocation()">위치전송</button>
+
+    <script>
+        function sendCurrentLocation() {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                console.log("위도:", latitude, "경도:", longitude);
+
+                fetch("/currentloc", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        latitude,
+                        longitude
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("FastAPI 응답:", data);
+                    alert("서버 응답: " + JSON.stringify(data));
+                });
+            });
+        }
+    </script>
+</body> -->
+<!-- <body>
+<div class="contain">
+    <label></label>
+    <input>
+</div>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sinkhole & House Search</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .search-bar input {
+      width: 60%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .categories {
+      display: flex;
+      justify-content: space-around;
+      margin: 2rem 0;
+    }
+    .categories button {
+      border: none;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      background-color: #e0e0e0;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+    form label {
+      display: block;
+      margin-top: 1rem;
+    }
+    form input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    button[type="submit"] {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+    #result {
+      margin-top: 2rem;
+      font-weight: bold;
+      color: #333;
+    }
+    .map {
+      background: #d0d0d0;
+      height: 250px;
+      border-radius: 10px;
+      margin-top: 1.5rem;
+      text-align: center;
+      line-height: 250px;
+      font-size: 1.2rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sinkhole & House Info</h1>
+
+    <!-- Location Form -->
+    <form id="locationForm">
+      <label>시:
+        <input type="text" id="city" required />
+      </label>
+      <label>구/군:
+        <input type="text" id="district" required />
+      </label>
+      <button type="submit">전송</button>
+    </form>
+
+    <!-- 결과 -->
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('locationForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const city = document.getElementById('city').value;
+      const district = document.getElementById('district').value;
+
+      try {
+        const response = await fetch('/aptsinkhole', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ city, district }),
+        });
+
+        const data = await response.json();
+        resultDiv.innerHTML = ""; // 초기화
+
+        data.list.forEach(item => {
+          const div = document.createElement("div");
+          div.innerHTML = 
+            <strong>[${item.sagoDate}]</strong><br/>
+            사고번호: ${item.sagoNo}<br/>
+            내용: ${item.sagoDetail}<br/><br/>
+          ;
+          resultDiv.appendChild(div);
+        });
+      } catch (err) {
+        resultDiv.textContent = '서버 요청 실패: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <title>Sinkhole Warning</title>
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="first.css" />
+  <link rel="stylesheet" href="second.css" />
+</head>
+<body>
+  <div class="hero">
+    <div class="overlay"></div>
+
+    <div class="navbar">
+      <div class="logo"><strong>Sinkhole Watch</strong></div>
+      <ul>
+          <li><a href="#" id="link-first">싱크홀 관련 사이트</a></li>
+          <li><a href="#" id="link-second">당신 근처 싱크홀</a></li>
+          <li><a href="#" id="link-third">데이터 시각화</a></li>
+          <li><a href="#" id="link-fourth">데이터 파악</a></li>
+      </ul>
+    </div>
+
+    <div class="hero-content">
+      <h1>지구의 경고,<br>싱크홀을 주목하세요</h1>
+    </div>
+
+    <div class="scroll-down">
+      ↓ Scroll Down
+    </div>
+  </div>
+  <div id="first-section"></div>
+  <div id="second-section"></div>
+  <div id="third-section"></div>
+  <div id="fourth-section"></div>
+
+  <script>
+    // "싱크홀 현황"
+    document.getElementById('link-first').addEventListener('click', function(e) {
+      e.preventDefault();
+      fetch('first.html')
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('first-section').innerHTML = data;
+          document.getElementById('first-section').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // "당신 근처 싱크홀"
+    document.getElementById('link-second').addEventListener('click', function(e) {
+      e.preventDefault();
+      fetch('second.html')
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('second-section').innerHTML = data;
+          document.getElementById('second-section').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // "데이터 시각화"
+    document.getElementById('link-third').addEventListener('click', function(e) {
+      e.preventDefault();
+      fetch('third.html')
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('third-section').innerHTML = data;
+          document.getElementById('third-section').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // "데이터 파악"
+    document.getElementById('link-fourth').addEventListener('click', function(e) {
+      e.preventDefault();
+      fetch('fourth.html')
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('fourth-section').innerHTML = data;
+          document.getElementById('fourth-section').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+  </script>
+
+</body>
+</html>

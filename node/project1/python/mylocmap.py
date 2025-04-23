@@ -7,7 +7,7 @@ def geocoding(address):
 
   return crd
 
-address = input("ㅎ도로명 주소를 입력하세요")
+address = input("도로명 주소를 입력하세요")
 crd= geocoding(address)
 print(crd)
 print('위도:' , crd['lat'])

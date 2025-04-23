@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sinkholes & Houses</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'MBC1961GulimM';
+      src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2304-01@1.0/MBC1961GulimM.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      color: #333;
+    }
+    header {
+      height: 80px;
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .icon-bar {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      padding: 10px 0;
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 80px;
+      z-index: 1000;
+    }
+    .icon {
+      font-size: 28px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .icon:hover {
+      transform: scale(1.2);
+    }
+    .icon-label {
+      display: none;
+      margin-top: 6px;
+      font-size: 0.92rem;
+      color: #5a67d8;
+      background: #f8f8ff;
+      border-radius: 6px;
+      padding: 2px 10px;
+      white-space: nowrap;
+      position: absolute;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 1px 4px rgba(90,103,216,0.08);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .icon.active .icon-label {
+      display: block;
+    }
+    .main-content {
+      margin-top: 30px;
+      padding: 2rem;
+      background-color: white;
+      min-height: 300px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .container h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-family: 'MBC1961GulimM', sans-serif;
+    }
+    form label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    form input {
+      padding: 8px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      box-sizing: border-box;
+      margin-left: 8px;
+      width: 50%;
+    }
+    button[type="submit"] {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      background-color: #5a67d8;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button[type="submit"]:hover {
+      background-color: #434190;
+    }
+    #result {
+      margin-top: 2rem;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <header>당신 근처의 싱크홀</header>
+  <div class="icon-bar">
+    <span class="icon" onclick="showContent('home', this)">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="icon-label">홈으로 이동</span>
+    </span>
+    <span class="icon" onclick="showContent('form', this)">
+      <span class="material-symbols-outlined">search</span>
+      <span class="icon-label">검색 화면</span>
+    </span>
+    <span class="icon" onclick="showContent('data', this)">
+      <span class="material-symbols-outlined">apartment</span>
+      <span class="icon-label">데이터 보기</span>
+    </span>
+  </div>
+  <div class="main-content" id="content">
+    여기에 내용이 표시됩니다.
+  </div>
+  <script>
+    function showContent(page, el) {
+      const content = document.getElementById('content');
+      // 아이콘 라벨 처리
+      document.querySelectorAll('.icon').forEach(icon => icon.classList.remove('active'));
+      if (el) el.classList.add('active');
+      if (page === 'form') {
+        content.innerHTML = `
+          <div class="container">
+            <h1>Sinkhole & House Info</h1>
+            <form id="locationForm">
+              <label>시:
+                <input type="text" id="city" required />
+              </label>
+              <label>구/군:
+                <input type="text" id="district" required />
+              </label>
+              <button type="submit">전송</button>
+            </form>
+            <div id="result"></div>
+          </div>
+        `;
+        bindFormHandler();
+      }
+      else if (page === 'home') {
+        content.innerHTML = `
+          <div class="container">
+            <h1>홈 화면</h1>
+            <p>아래는 싱크홀 위치 지도입니다.</p>
+            <div id="map" style="width: 100%; height: 400px;"></div>
+          </div>
+        `;
+        // 지도 생성 & 싱크홀 데이터 마커 표시
+        setTimeout(async () => {
+          try {
+            const res = await fetch('/r_aptsinkhole?city=서울특별시&district=강남구');
+            const data = await res.json();
+            showMapWithSinkholes(data.list);
+          } catch (err) {
+            console.error('지도 데이터 로드 실패:', err);
+          }
+        }, 100);
+      }
+      else if (page === 'data') {
+        content.innerHTML = `
+          <div class="container">
+            <h1>📊 데이터 보기</h1>
+            <p>데이터 시각화 예정</p>
+          </div>
+        `;
+      }
+      else if (page === 'settings') {
+        content.innerHTML = `
+          <div class="container">
+            <h1>⚙️ 설정</h1>
+            <p>환경 설정을 여기에 추가하세요.</p>
+          </div>
+        `;
+      }
+    }
+    function bindFormHandler() {
+      setTimeout(() => {
+        const form = document.getElementById('locationForm');
+        const resultDiv = document.getElementById('result');
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          const city = document.getElementById('city').value;
+          const district = document.getElementById('district').value;
+          try {
+            const response = await fetch('/aptsinkhole', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ city, district }),
+            });
+            const data = await response.json();
+            resultDiv.innerHTML = "";
+            data.list.forEach(item => {
+              const div = document.createElement("div");
+              div.innerHTML = `
+                <strong>[${item.sagoDate}]</strong><br/>
+                사고번호: ${item.sagoNo}<br/>
+                내용: ${item.sagoDetail}<br/><br/>
+              `;
+              resultDiv.appendChild(div);
+            });
+          } catch (err) {
+            resultDiv.textContent = '서버 요청 실패: ' + err.message;
+          }
+        });
+      }, 100);
+    }
+    window.onload = () => {
+      // 첫 화면은 홈 & 홈 아이콘 active
+      showContent('home', document.querySelectorAll('.icon')[0]);
+    };
+    // 싱크홀 지도와 마커 표시 함수
+    function showMapWithSinkholes(list) {
+      const mapDiv = document.getElementById('map');
+      if (!mapDiv) return;
+      // 기존 지도 인스턴스가 있으면 제거
+      if (window.sinkholeMap) {
+        window.sinkholeMap.remove();
+      }
+      // 기본 위치: 서울 강남구
+      let center = [37.5172, 127.0473];
+      if (list && list.length > 0 && list[0].lat && list[0].lng) {
+        center = [list[0].lat, list[0].lng];
+      }
+      // 지도 생성
+      const map = L.map('map').setView(center, 13);
+      window.sinkholeMap = map;
+      // 타일 레이어 추가
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      // 싱크홀 마커 추가
+      if (list && list.length > 0) {
+        list.forEach(item => {
+          if (item.lat && item.lng) {
+            L.marker([item.lat, item.lng])
+              .addTo(map)
+              .bindPopup(`<b>${item.sagoDate || ''}</b><br>${item.sagoDetail || ''}`);
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
