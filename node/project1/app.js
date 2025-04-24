@@ -48,17 +48,16 @@ app.get("/", (req, res) => {
 });
 
 // 위치(city, district)를 받아서 FastAPI 서버로 GET 요청 보내기
-app.post("/aptsinkhole", async (req, res) => {
-    const { city, district } = req.body;
-  
+app.get("/aptsinkhole", async (req, res) => {
+    const { sido, sigungu } = req.query;
     try {
       // GET 요청 시, 쿼리 스트링에 넣기
       const response = await axios.get(
-        "/r_aptsinkhole",  // FastAPI 서버 주소
+        "http://192.168.1.39:3000/r_aptsinkhole",  // FastAPI 서버 전체 주소로 수정
         {
           params: {
-            sido: city,
-            sigungu: district
+            sido,
+            sigungu
           }
         }
       );

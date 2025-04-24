@@ -30,7 +30,7 @@ code_df["법정동명"] = code_df["법정동명"].str.strip()
 
 ## 싱크홀 리스트
 @app.get("/r_aptsinkhole")
-async def get_sinkhole(
+async def get_aptsinkhole(
     sido: str = Query("서울특별시", description="시/도 이름 (예: 서울특별시)"),
     sigungu: str = Query("강남구", description="시/군/구 이름 (예: 강남구)")
 ):
@@ -69,6 +69,7 @@ async def get_sinkhole(
     }
     
 ##아파트 매매가 리스트
+'''
 @app.get("/r_aptsinkholes")
 async def get_aptinfo(
     sido: str = Query("서울특별시", description="시/도 이름"),
@@ -173,6 +174,6 @@ async def sinkhole_nearby(lat: float, lng: float):
                 })
 
     return {"list": filtered_items}
-
+'''
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=3000)

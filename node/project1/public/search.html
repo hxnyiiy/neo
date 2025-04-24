@@ -91,20 +91,37 @@
       padding: 0.5rem;
       cursor: pointer;
     }
-    form label {
-      display: block;
-      margin-top: 1rem;
-    }
-    form input {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    button[type="submit"] {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-    }
+    form#locationForm {
+  margin-bottom: 2rem;
+}
+form#locationForm label {
+  display: block;
+  margin-bottom: 0.3rem;
+}
+form#locationForm input {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 0.2rem;
+  box-sizing: border-box;
+}
+form#locationForm button[type="submit"] {
+  margin-top: 0;
+  height: 48px;
+  padding: 0 2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+form#locationForm button[type="submit"]:hover {
+  background: #1565c0;
+}
     #result {
       margin-top: 2rem;
       font-weight: bold;
@@ -128,12 +145,14 @@
 
     <!-- Location Form -->
     <form id="locationForm">
-      <label>시:
+      <div>
+        <label for="city">시</label>
         <input type="text" id="city" required />
-      </label>
-      <label>구/군:
+      </div>
+      <div>
+        <label for="district">구/군</label>
         <input type="text" id="district" required />
-      </label>
+      </div>
       <button type="submit">전송</button>
     </form>
 
@@ -152,7 +171,7 @@
 
       try {
         const response = await fetch('/aptsinkhole', {
-          method: 'POST',
+          method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ city, district }),
         });

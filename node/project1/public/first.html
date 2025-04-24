@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Layout</title>
+  <link rel="stylesheet" href="first.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      gap: 40px;
+    }
+    .left-panel, .right-panel {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 360px;
+    }
+    .filter-section h3 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+    .filter-section form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .filter-section label {
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .filter-section input {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .filter-section button {
+      padding: 8px 12px;
+      border: none;
+      background-color: #4a90e2;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .graph-box, .map-box {
+      margin-top: 20px;
+    }
+    .graph-title {
+      text-align: center;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    #bar-chart {
+      width: 100%;
+      max-width: 380px;
+      height: 160px;
+      margin: 12px auto 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-end;
+      gap: 0;
+      background: #f6f8fa;
+      border-radius: 8px;
+      box-sizing: border-box;
+      padding: 8px 6px 0 6px;
+      position: relative;
+    }
+    #bar-chart .bar-area {
+      display: flex;
+      align-items: flex-end;
+      height: 112px;
+      width: 100%;
+      gap: 2px;
+    }
+    #bar-chart .x-axis {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 2px;
+      font-size: 12px;
+      color: #333;
+    }
+    #bar-chart .x-axis div {
+      width: 8%;
+      text-align: center;
+      margin: 0 1px;
+    }
+    .sinkhole-map-iframe {
+      width: 100%;
+      height: 300px;
+      border: none;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <div class="filter-section">
+        <h3>위치 선택</h3>
+        <form id="first-locationForm" onsubmit="return false;">
+          <div>
+            <label for="city-first">시도</label>
+            <input type="text" id="city-first" required />
+          </div>
+          <div>
+            <label for="district-first">구/군</label>
+            <input type="text" id="district-first" required />
+          </div>
+          <button id="load-sinkholes">싱크홀 데이터 불러오기</button>
+<div id="sinkhole-result"></div>
+        </form>
+        <div id="result-first"></div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="graph-box">
+        <div id="sinkhole-stats" style="display: flex; gap: 32px; justify-content: center; align-items: center; background: #f7fafd; border: 1.5px solid #cce3f7; border-radius: 14px; padding: 18px 0; margin-bottom: 18px; min-height: 85px; box-shadow: 0 2px 8px rgba(80,180,255,0.07);"></div>
+        <div id="bar-chart"></div>
+      </div>
+
+      <div class="map-box">
+        <h3 style="text-align:center;">국내 싱크홀 발생 위치</h3>
+        <div class="chart" style="display:flex; justify-content:center;">
+          <iframe src="/sinkhole_map.html" class="sinkhole-map-iframe"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('first-locationForm');
+    const resultDiv = document.getElementById('result-first');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const city = document.getElementById('city-first').value;
+      const district = document.getElementById('district-first').value;
+
+      try {
+        const response = await fetch(`/sinkhole?sido=${encodeURIComponent(city)}&sigungu=${encodeURIComponent(district)}`);
+        const data = await response.json();
+        resultDiv.innerHTML = "";
+
+        data.list.forEach(item => {
+          const div = document.createElement("div");
+          div.innerHTML =
+            `<strong>[${item.sagoDate}]</strong><br/>` +
+            `사고번호: ${item.sagoNo}<br/>` +
+            `내용: ${item.sagoDetail}<br/><br/>`;
+          resultDiv.appendChild(div);
+        });
+      } catch (err) {
+        resultDiv.textContent = '서버 요청 실패: ' + err.message;
+      }
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // 싱크홀 통계 아이콘+숫자 표시
+      fetch('sinkhole_stats.json')
+        .then(res => res.json())
+        .then(stats => {
+          const statsBox = document.getElementById('sinkhole-stats');
+          if (statsBox) {
+            statsBox.innerHTML = `
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 2rem;">🕳️</span>
+                <span style="font-weight: bold; font-size: 1.1rem;">${stats.total}</span>
+                <span style="font-size: 0.9rem; color: #555;">총 싱크홀</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 2rem;">🛠️</span>
+                <span style="font-weight: bold; font-size: 1.1rem;">${stats.restored}</span>
+                <span style="font-size: 0.9rem; color: #555;">복구 완료</span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <span style="font-size: 2rem;">📅</span>
+                <span style="font-weight: bold; font-size: 1.1rem;">${stats.this_year}</span>
+                <span style="font-size: 0.9rem; color: #555;">올해 발생</span>
+              </div>
+            `;
+          }
+        });
+      drawBarChart('2024'); // 연도 선택 없으므로 디폴트로 2024
+    });
+  </script>
+  <script src="mapLoader.js"></script>
+  <script src="index.js"></script>
+</body>
+</html>
