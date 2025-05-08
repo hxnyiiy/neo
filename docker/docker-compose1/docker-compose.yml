@@ -1,0 +1,37 @@
+##service definition
+version:"3.3"
+sevices:
+  webserver:
+    image:ubuntu
+    ports:
+      -"80:80"
+    networks:
+      -webnet
+
+  redis:
+    image: redis
+    networks:
+      -webnet
+
+##Network Dfinition
+networks:
+  webnet:
+
+##Data Volume Definition
+Volumes:
+  data-volume:
+
+## Container link
+links:
+  - logserver
+  - logserver:log01
+
+## Ports
+ports:
+  - "3000"
+  - "8000:80"
+  - "127.0.0.1:8000:8000"
+
+## exposes
+expose:
+  - "3000"
