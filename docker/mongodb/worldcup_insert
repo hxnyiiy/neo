@@ -1,0 +1,14 @@
+use test
+
+db.worldcup.insert({no:1, nation:"Filastin", date:"20240905", score:"0-0"})
+ db.worldcup.insert({no:2, nation:"Oman", date:"20240910",score:"3-1"})
+ db.worldcup.insert({no:3, nation:"Jordan", date:"20241010", score:"2-0"})
+ db.worldcup.insert({no:4, nation:"Iraq", date:"20241015", score:"3-2"})
+ db.worldcup.insert({no:5, nation:"Kuwait", date:"20241114", score:"3-1"})
+ db.worldcup.insert({no:6, nation:"Filastin", date:"20241119", score:"1-1"})
+ db.worldcup.insert({no:7, nation:"Oman", date:"20250320", score:"1-1"})
+ db.worldcup.insert({no:8, nation:"Jordan", date:"20250326", score:"1-1"})
+ db.worldcup.insert({no:9, nation:"Iraq", date:"20250606"})
+ db.worldcup.insert({no:10, nation:"Kuwait", date:"20250610"})
+
+ db.worldcup.find()
