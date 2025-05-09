@@ -1,6 +1,6 @@
-##service definition
+## Service Definition
 version:"3.3"
-sevices:
+services:
   webserver:
     image:ubuntu
     ports:
@@ -13,11 +13,11 @@ sevices:
     networks:
       -webnet
 
-##Network Dfinition
+## Network Definition
 networks:
   webnet:
 
-##Data Volume Definition
+## Data Volume Definition
 Volumes:
   data-volume:
 
@@ -31,6 +31,7 @@ ports:
   - "3000"
   - "8000:80"
   - "127.0.0.1:8000:8000"
+
 
 ## exposes
 expose:
