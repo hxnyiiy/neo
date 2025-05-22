@@ -5,17 +5,17 @@ stop: k8stop dockerstop
 
 # === Docker 빌드 및 실행 ===
 build:
-	docker build -t remote .
+	docker build -t weather .
 run:
-	docker run -it -d -p 8000:8000 --name remote remote
+	docker run -it -d -p 8000:8000 --name weather weather
 exec:    
-	docker exec -it remote /bin/bash
+	docker exec -it weather /bin/bash
 dstart:
-	docker start remote
+	docker start weather
 dstop:
-	docker stop remote
+	docker stop weather
 dlogs:
-	docker logs remote
+	docker logs weather
 ps:
 	docker ps -a
 img:
@@ -29,13 +29,16 @@ rmi:
 k8init: k8commit k8clean
 
 k8commit:
-	docker commit remote remoteapi
-	docker tag remoteapi hxnyiiy01/remoteapi
-	docker push hxnyiiy01/remoteapi
+	docker commit weather weathers
+	docker tag weathers hxnyiiy01
+	/weathers
+	docker push hxnyiiy01
+	/weathers
 
 k8clean:
-	docker rm -f $$(docker ps -aq)
-	docker rmi -f $$(docker images -q)
+	docker rm -f weather
+	docker rmi -f weather weathers hxnyiiy01
+	/weathers
 
 # === Kubernetes 명령 ===
 appdep:
@@ -57,26 +60,26 @@ getnode:
 	kubectl get nodes
 
 klogs:
-	kubectl logs $$(kubectl get pod --no-headers | grep remoteapi | awk '{print $$1}')
+	kubectl logs $$(kubectl get pod --no-headers | grep weathers | awk '{print $$1}')
 
 # === Kubernetes 삭제 ===
 k8stop: delsvc deldep delpod
 
 delsvc:
-	kubectl delete svc remoteapi
+	kubectl delete svc weathers
 
 deldep:
-	kubectl delete deployment remoteapi
+	kubectl delete deployment weathers
 
 delpod:
-	kubectl get pod --no-headers | grep remoteapi | awk '{print $$1}' | xargs -r -I {} kubectl delete pod {} --force
+	kubectl get pod --no-headers | grep weathers | awk '{print $$1}' | xargs -r -I {} kubectl delete pod {} --force
 
 # === Kubernetes 상세 정보 ===
 desdep:
-	kubectl describe deployment remoteapi
+	kubectl describe deployment weathers
 
 dessvc:
-	kubectl describe svc remoteapi
+	kubectl describe svc weathers
 
 despod:
-	kubectl describe pod $$(kubectl get pod --no-headers | grep remoteapi | awk '{print $$1}')
+	kubectl describe pod $$(kubectl get pod --no-headers | grep weathers | awk '{print $$1}')
