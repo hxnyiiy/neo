@@ -25,11 +25,11 @@ node/**/package-lock.json
 node/**/.serverless
 
 ## python
-python/**/.idea
-python/**/.venv
-python /**/__pycache__/
+.idea
+**/.venv
+**/__pycache__/
 secret.json
-**/ secret.json
+**/secret.json
 
 ## python
 mongodb/backup
