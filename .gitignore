@@ -30,6 +30,8 @@ node/**/.serverless
 **/__pycache__/
 secret.json
 **/secret.json
+**/*.mp4
+**/*.mp3
 
 ## python
 mongodb/backup
