@@ -1,9 +1,9 @@
 services:
   openWebUI:
-    image: ghcr.io/open-webui/open-webui:latest
+    image: ghcr.io/open-webui/open-webui:main
     restart: always
     ports:
-      - "3000:8000"
+      - "3000:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
