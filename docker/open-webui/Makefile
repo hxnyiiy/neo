@@ -8,5 +8,5 @@ run:
 stop:
 	docker compose down
 rm:
-	docker volume rm ollama local
+	docker volume rm ollama-local
 	docker volume rm open-webui-local
