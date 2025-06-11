@@ -25,9 +25,10 @@ app.get('/list', (req, res) => {
     }
     s3.listObjects(params, function(err, data) {
         if (err) throw err;
+
         // res.json(data.Contents)
         res.writeHead(200);
-        var template = `
+        let template = `
             <!doctype html>
             <html>
             <head>
@@ -41,27 +42,23 @@ app.get('/list', (req, res) => {
                         <th> LastModified </th>
                         <th> Size </th>
                         <th> StorageClass </th>
-                        <th> Down </th>
-                        <th> Del </th>
+                        <th> Play Button </th>
                     </tr>
         `;
         for (var i = 1; i < data.Contents.length; i++) {
+            const key = data.Contents[i].Key;
+            const fileurl = `https://${BUCKET_NAME}.s3.${MYREGION}.amazonaws.com/${encodeURIComponent(key)}`;
           template += `
                     <tr>
                         <th> ${data.Contents[i]['Key']} </th>
                         <th> ${data.Contents[i]['LastModified']} </th>
                         <th> ${data.Contents[i]['Size']} </th>
                         <th> ${data.Contents[i]['StorageClass']} </th>
-                        <th> 
-                            <form method='post' action='downloadFile'>
-                            <button type='submit' name='dlKey' value=${data.Contents[i]['Key']}>Down</button>
-                            </form>
-                        </th>
-                        <th> 
-                            <form method='post' action='deleteFile'>
-                            <button type='submit' name='dlKey' value=${data.Contents[i]['Key']}>Del</button>
-                            </form>
-                        </th>
+                        <th>
+                          <audio controls>
+                            <source src="${fileurl}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                          </audio>
                     </tr>
             `;
         }

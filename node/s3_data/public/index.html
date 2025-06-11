@@ -1,0 +1,92 @@
+S3 웹 업로드 프론트엔드 (public/index.html)이 파일은 사용자가 파일을 선택하고 업로드 요청을 보낼 수 있는 간단한 HTML 페이지입니다. 또한 iframe을 통해 S3 버킷에 있는 파일 목록을 표시합니다.<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 오디오 파일 업로드 및 목록</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #333; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 1.5rem; background-color: #fff; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        h1 { font-size: 1.75rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; }
+        .form-section { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb; }
+        .file-input-wrapper { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+        .file-input { border: 1px solid #d1d5db; padding: 0.5rem; border-radius: 0.375rem; flex-grow: 1; }
+        .btn { padding: 0.625rem 1.25rem; background-color: #2563eb; color: #fff; border-radius: 0.375rem; font-weight: 500; cursor: pointer; transition: background-color 0.2s; border: none; }
+        .btn:hover { background-color: #1d4ed8; }
+        .message-box { padding: 0.75rem 1rem; border-radius: 0.375rem; margin-top: 1rem; font-size: 0.875rem; }
+        .message-success { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .message-error { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .list-section { margin-top: 2rem; }
+        iframe { border-radius: 0.5rem; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>S3 파일 업로드</h1>
+        <div class="form-section">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <label for="audiofile" class="block text-gray-700 font-medium mb-2">업로드할 오디오 파일 선택:</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="audiofile" name="audiofile" accept="audio/*" class="file-input">
+                    <button type="submit" class="btn">업로드</button>
+                </div>
+            </form>
+            <div id="uploadMessage" class="message-box hidden"></div>
+        </div>
+
+        <div class="list-section">
+            <h1>S3 오디오 파일 목록</h1>
+            <hr class="my-4">
+            <iframe name="fileListFrame" class="w-full h-96" style="border: none;" src="/list"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // 폼 기본 제출 방지
+
+            const fileInput = document.getElementById('audiofile');
+            const messageBox = document.getElementById('uploadMessage');
+            messageBox.classList.add('hidden'); // 기존 메시지 숨기기
+
+            if (fileInput.files.length === 0) {
+                messageBox.textContent = '업로드할 파일을 선택해주세요.';
+                messageBox.classList.remove('hidden', 'message-success');
+                messageBox.classList.add('message-error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('audiofile', fileInput.files[0]); // 'audiofile'은 백엔드의 upload.single('audiofile')과 일치해야 함
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData, // FormData 객체는 자동으로 Content-Type: multipart/form-data를 설정
+                });
+
+                const text = await response.text(); // 서버 응답을 텍스트로 받음
+
+                if (response.ok) { // HTTP 상태 코드가 2xx 범위인 경우
+                    messageBox.textContent = text;
+                    messageBox.classList.remove('hidden', 'message-error');
+                    messageBox.classList.add('message-success');
+                    // 파일 목록 iframe 새로고침
+                    document.querySelector('iframe').contentWindow.location.reload(true);
+                } else {
+                    messageBox.textContent = `업로드 실패: ${text}`;
+                    messageBox.classList.remove('hidden', 'message-success');
+                    messageBox.classList.add('message-error');
+                }
+            } catch (error) {
+                messageBox.textContent = `네트워크 오류 발생: ${error.message}`;
+                messageBox.classList.remove('hidden', 'message-success');
+                messageBox.classList.add('message-error');
+                console.error('업로드 중 네트워크 오류:', error);
+            }
+        });
+    </script>
+</body>
+</html>

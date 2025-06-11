@@ -1,0 +1,11 @@
+// public/confirmation.ejs
+
+<h1>Success!!</h1> // 성공 메시지
+
+<% if(file) { %> // 서버에서 'file' 변수가 전달되었는지 확인
+   <pre>
+    <%=JSON.stringify(file, null, 2) %> // 'file' 객체의 내용을 JSON 형식으로 예쁘게 출력
+   </pre>
+<% } %>
+
+<a href="/">Back</a> // 초기 업로드 화면으로 돌아가는 링크
