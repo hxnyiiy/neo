@@ -1,9 +1,9 @@
-# .env
+## .env
 .env
 
 ## c program
 c/*
-c/makefile/test
+c/*.o
 !c/**/*.c
 !c/**/*.h
 !c/**/*.a
@@ -16,7 +16,7 @@ c/makefile/test
 scala/**/project
 scala/**/target
 
-##Maven
+## Maven
 maven/**/target
 
 ## nodejs
@@ -26,23 +26,36 @@ node/**/.serverless
 
 ## python
 .idea
+secret.json
 **/.venv
 **/__pycache__/
-secret.json
-**/secret.json
+**/ secret.json
 **/*.mp4
 **/*.mp3
 
-## python
+**/model.safetensors
+**/llama.cpp
+**/*.gguf
+**/traning_data
+**/sft.json
+**/finefuned-*
+
+## mongodb
 mongodb/backup
 
-##oracle
+## oracle
 oracle/node/dbConfig.js
 oracle/**/node_modules
 oracle/**/package-lock.json
 
+## docker
+docker/mysql/mysql*
+docker/mongodb/mongo*
 
-**/node_*
-**/package*
+## bookmateproject
+bookmateproject/node/**/node_modules
+bookmateproject/node/**/package-lock.json
 
+## nestjs
 nestjs
+
